@@ -44,7 +44,36 @@ def get_price_data(ticker: str, start: str = None, end: str = None) -> pd.DataFr
     df.to_csv(cache_file)
     return df
 
+def get_portfolio_data(tickers: list[str], start=None, end=None):
+    """
+    Combine multilpe tickers into a single DataFrame
+
+    Parameters:
+        tickers: List of stock/ETF symbols, e.g. ["AAPL", "MSFT"]
+        start: Start date as "YYYY-MM-DD". Defaults to 5 years ago.
+        end: End date as "YYYY-MM-DD". Defaults to today.
+    
+    Returns:
+        DataFrame of daily closing prices, one column per ticker, indexed by Date.
+    """
+    if start is None:
+        start = (datetime.now() - timedelta(days=5 * 365)).strftime("%Y-%m-%d")
+    if end is None:
+        end = datetime.now().strftime("%Y-%m-%d")
+
+    close_prices = {}
+    for ticker in tickers:
+        df = get_price_data(ticker, start, end)
+        close_prices[ticker] = df["Close"]
+
+    result = pd.DataFrame(close_prices)
+
+    result = result.dropna()
+
+    return result
+
+
 if __name__ == "__main__":
-    df = get_price_data("AAPL")
+    df = get_portfolio_data(["AAPL", "MSFT"])
     print(df.head())
     print(df.shape)
