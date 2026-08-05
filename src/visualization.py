@@ -43,7 +43,8 @@ if __name__ == "__main__":
 
 
     # Example usage
-    prices = get_portfolio_data(["AAPL", "MSFT"])
+    # prices = get_portfolio_data(["AAPL", "MSFT"])
+    prices = get_portfolio_data(["AAPL", "MSFT", "GOOGL", "AMZN", "JPM"])
     daily_returns = calculate_daily_returns(prices)
 
     expected_returns = calculate_expected_returns(daily_returns)
