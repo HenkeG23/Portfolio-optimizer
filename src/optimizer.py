@@ -87,7 +87,49 @@ def optimize_min_volatility(expected_returns: np.ndarray, cov_matrix: np.ndarray
     optimal_weights = results.x
 
     return optimal_weights
-    
+
+def calculate_efficient_frontier(expected_returns: np.ndarray, cov_matrix: np.ndarray, num_points: int = 50) -> tuple[np.ndarray, np.ndarray]:
+
+    """
+    Calculate the efficient frontier by optimizing portfolios for a range of target returns.
+
+    Parameters:
+        expected_returns: Array of expected returns for each asset.
+        cov_matrix: Covariance matrix of asset returns.
+        num_points: Number of points on the efficient frontier to calculate.
+    Returns:
+        Tuple containing arrays of portfolio volatilities and returns for the efficient frontier.
+    """
+    min_return = np.min(expected_returns)
+    max_return = np.max(expected_returns)
+    target_returns = np.linspace(min_return, max_return, num_points)
+
+    frontier_volatilities = []
+    frontier_returns = []
+
+    for target_return in target_returns:
+        constraints = (
+            {'type': 'eq', 'fun': lambda weights: np.sum(weights) - 1},
+            {'type': 'eq', 'fun': lambda weights: calculate_portfolio_performance(weights, expected_returns, cov_matrix)[0] - target_return}
+
+        )
+
+        result = minimize(
+            portfolio_volatility,
+            x0=np.array([1/len(expected_returns)] * len(expected_returns)),
+            args=(expected_returns, cov_matrix),
+            method='SLSQP',
+            bounds=tuple((0, 1) for _ in range(len(expected_returns))),
+            constraints=constraints
+        )
+
+        optimal_weights = result.x
+        optimal_return, optimal_volatility = calculate_portfolio_performance(optimal_weights, expected_returns, cov_matrix)
+        frontier_volatilities.append(optimal_volatility)
+        frontier_returns.append(target_return)
+
+    return np.array(frontier_volatilities), np.array(frontier_returns)
+
 if __name__ == "__main__":
     from data_fetcher import get_portfolio_data
     from returns import calculate_daily_returns
@@ -104,4 +146,9 @@ if __name__ == "__main__":
 
     optimal_weights = optimize_min_volatility(expected_returns.values, cov_matrix.values)
     print("Optimal Weights for Minimum Volatility Portfolio:", optimal_weights)
-    
+
+    frontier_volatilities, frontier_returns = calculate_efficient_frontier(expected_returns.values, cov_matrix.values)
+    print("Efficient Frontier Points:")
+    for vol, ret in zip(frontier_volatilities, frontier_returns):
+        print(f"Volatility: {vol:.4f}, Return: {ret:.4f}")
+        
