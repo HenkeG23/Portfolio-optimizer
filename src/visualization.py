@@ -1,7 +1,15 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 
-def plot_efficient_frontier(results: pd.DataFrame, max_sharpe_portfolio: pd.Series, min_volatility_portfolio: pd.Series):
+def plot_efficient_frontier(
+        results: pd.DataFrame,
+        max_sharpe_portfolio: pd.Series,
+        min_volatility_portfolio: pd.Series,
+        opt_sharpe_return: float,
+        opt_sharpe_volatility: float,
+        opt_min_vol_return: float,
+        opt_min_vol_volatility: float
+        ) -> None:
     """
     Plot the efficient frontier based on Monte Carlo simulation results.
 
@@ -15,6 +23,10 @@ def plot_efficient_frontier(results: pd.DataFrame, max_sharpe_portfolio: pd.Seri
     plt.colorbar(label='Sharpe Ratio')
     plt.scatter(max_sharpe_portfolio['Volatility'], max_sharpe_portfolio['Returns'], color='r', marker='*', s=500, label='Max Sharpe Ratio')
     plt.scatter(min_volatility_portfolio['Volatility'], min_volatility_portfolio['Returns'], color='b', marker='*', s=500, label='Min Volatility')
+
+    plt.scatter(opt_sharpe_volatility, opt_sharpe_return, color='orange', marker='X', s=500, label='Optimal Sharpe Portfolio')
+    plt.scatter(opt_min_vol_volatility, opt_min_vol_return, color='green', marker='X', s=500, label='Optimal Min Volatility Portfolio')
+
     plt.title('Efficient Frontier')
     plt.xlabel('Volatility (Standard Deviation)')
     plt.ylabel('Expected Returns')
@@ -25,8 +37,10 @@ def plot_efficient_frontier(results: pd.DataFrame, max_sharpe_portfolio: pd.Seri
 if __name__ == "__main__":
     from data_fetcher import get_portfolio_data
     from returns import calculate_daily_returns
-    from portfolio_metrics import calculate_expected_returns, calculate_covariance_matrix
+    from portfolio_metrics import calculate_expected_returns, calculate_covariance_matrix, calculate_portfolio_performance 
     from monte_carlo import monte_carlo_simulation, find_optimal_portfolios
+    from optimizer import optimize_max_sharpe, optimize_min_volatility
+
 
     # Example usage
     prices = get_portfolio_data(["AAPL", "MSFT"])
@@ -39,4 +53,18 @@ if __name__ == "__main__":
 
     max_sharpe_portfolio, min_volatility_portfolio = find_optimal_portfolios(results)
 
-    plot_efficient_frontier(results, max_sharpe_portfolio, min_volatility_portfolio)
+    opt_sharpe_weights = optimize_max_sharpe(expected_returns.values, cov_matrix.values, risk_free_rate=0.02)
+    opt_sharpe_return, opt_sharpe_volatility = calculate_portfolio_performance(opt_sharpe_weights, expected_returns, cov_matrix)
+
+    opt_min_vol_weights = optimize_min_volatility(expected_returns.values, cov_matrix.values)
+    opt_min_vol_return, opt_min_vol_volatility = calculate_portfolio_performance(opt_min_vol_weights, expected_returns, cov_matrix)
+
+    plot_efficient_frontier(
+        results,
+        max_sharpe_portfolio,
+        min_volatility_portfolio,
+        opt_sharpe_return,
+        opt_sharpe_volatility,
+        opt_min_vol_return,
+        opt_min_vol_volatility
+    )
