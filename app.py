@@ -3,7 +3,6 @@ import sys
 from pathlib import Path
 import pandas as pd
 import numpy as np
-import matplotlib as plt
 
 sys.path.append(str(Path(__file__).parent / "src"))
 
@@ -101,6 +100,35 @@ if st.session_state.get("analysis_done", False):
             "Normalized Weight": normalized_weights.round(4)
         })
         st.dataframe(weights_df_manual)
+
+        st.dataframe(weights_df_manual)
+
+        st.subheader("Portfolio Comparison")
+
+        comparison_data = {
+            "Portfolio": ["Max Sharpe", "Min Volatility", "Manual"],
+            "Expected Return": [opt_sharpe_return * 100, opt_minvol_return * 100, manual_return * 100],
+            "Volatility": [opt_sharpe_vol * 100, opt_minvol_vol * 100, manual_vol * 100],
+            "Sharpe Ratio": [
+                (opt_sharpe_return - risk_free_rate) / opt_sharpe_vol,
+                (opt_minvol_return - risk_free_rate) / opt_minvol_vol,
+                manual_sharpe
+            ]
+        }
+
+        comparison_df = pd.DataFrame(comparison_data)
+
+        st.dataframe(
+            comparison_df,
+            column_config={
+                "Expected Return": st.column_config.NumberColumn(format="%.2f%%"),
+                "Volatility": st.column_config.NumberColumn(format="%.2f%%"),
+                "Sharpe Ratio": st.column_config.NumberColumn(format="%.3f")
+            },
+            hide_index=True
+        )
+
+
 
 
         
