@@ -3,6 +3,7 @@ import sys
 from pathlib import Path
 import pandas as pd
 import numpy as np
+import matplotlib as plt
 
 sys.path.append(str(Path(__file__).parent / "src"))
 
@@ -10,7 +11,9 @@ from data_fetcher import get_portfolio_data
 from returns import calculate_daily_returns
 from portfolio_metrics import calculate_expected_returns, calculate_covariance_matrix, calculate_portfolio_performance
 from optimizer import optimize_max_sharpe, optimize_min_volatility
-
+from monte_carlo import monte_carlo_simulation, find_optimal_portfolios
+from visualization import plot_efficient_frontier
+from optimizer import optimize_max_sharpe, optimize_min_volatility, calculate_efficient_frontier
 
 st.title("Portfolio Optimizer")
 
@@ -54,6 +57,22 @@ if st.session_state.get("analysis_done", False):
 
     weights_df_minvol = pd.DataFrame({"Ticker": tickers, "Weight": opt_minvol_weights.round(4)})
     st.dataframe(weights_df_minvol)
+
+    st.subheader("Efficient Frontier")
+
+    mc_results = monte_carlo_simulation(expected_returns, cov_matrix, num_portfolios=2000, risk_free_rate=risk_free_rate)
+    frontier_volatilities, frontier_returns = calculate_efficient_frontier(expected_returns.values, cov_matrix.values, num_points=50)
+
+    fig = plot_efficient_frontier(
+        mc_results,
+        frontier_volatilities,
+        frontier_returns,
+        opt_sharpe_return,
+        opt_sharpe_vol,
+        opt_minvol_return,
+        opt_minvol_vol
+    )
+    st.pyplot(fig)
 
     st.subheader("Manual Portfolio Weights")
     st.write("Set relative weights - they will be normalized to sum to 1.")

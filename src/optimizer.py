@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 from scipy.optimize import minimize
 from portfolio_metrics import calculate_portfolio_performance
 
@@ -129,6 +130,8 @@ def calculate_efficient_frontier(expected_returns: np.ndarray, cov_matrix: np.nd
         frontier_returns.append(target_return)
 
     return np.array(frontier_volatilities), np.array(frontier_returns)
+
+
 
 if __name__ == "__main__":
     from data_fetcher import get_portfolio_data

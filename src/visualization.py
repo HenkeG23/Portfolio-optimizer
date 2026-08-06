@@ -1,38 +1,40 @@
 import matplotlib.pyplot as plt
 import pandas as pd
+import numpy as np
 
 def plot_efficient_frontier(
-        results: pd.DataFrame,
-        max_sharpe_portfolio: pd.Series,
-        min_volatility_portfolio: pd.Series,
-        opt_sharpe_return: float,
-        opt_sharpe_volatility: float,
-        opt_min_vol_return: float,
-        opt_min_vol_volatility: float
-        ) -> None:
-    """
-    Plot the efficient frontier based on Monte Carlo simulation results.
+    results: pd.DataFrame,
+    frontier_volatilities: np.ndarray,
+    frontier_returns: np.ndarray,
+    opt_sharpe_return: float,
+    opt_sharpe_volatility: float,
+    opt_min_vol_return: float,
+    opt_min_vol_volatility: float
+) -> plt.Figure:
 
-    Parameters:
-        results: DataFrame containing portfolio returns, volatilities, and weights for each simulated portfolio.
-        max_sharpe_portfolio: Series containing the weights of the portfolio with the maximum Sharpe ratio.
-        min_volatility_portfolio: Series containing the weights of the portfolio with the minimum volatility.
-    """
-    plt.figure(figsize=(10, 6))
-    plt.scatter(results['Volatility'], results['Returns'], c=results['Sharpe'], cmap='viridis', marker='o', s=10, alpha=0.3)
-    plt.colorbar(label='Sharpe Ratio')
-    plt.scatter(max_sharpe_portfolio['Volatility'], max_sharpe_portfolio['Returns'], color='r', marker='*', s=500, label='Max Sharpe Ratio')
-    plt.scatter(min_volatility_portfolio['Volatility'], min_volatility_portfolio['Returns'], color='b', marker='*', s=500, label='Min Volatility')
+    
+    fig, ax = plt.subplots(figsize=(10, 6))
 
-    plt.scatter(opt_sharpe_volatility, opt_sharpe_return, color='orange', marker='X', s=500, label='Optimal Sharpe Portfolio')
-    plt.scatter(opt_min_vol_volatility, opt_min_vol_return, color='green', marker='X', s=500, label='Optimal Min Volatility Portfolio')
+    scatter_obj = ax.scatter(results['Volatility'], results['Returns'], c=results['Sharpe'],
+                              cmap='viridis', marker='o', s=8, alpha=0.25)
+    fig.colorbar(scatter_obj, ax=ax, label='Sharpe Ratio')
 
-    plt.title('Efficient Frontier')
-    plt.xlabel('Volatility (Standard Deviation)')
-    plt.ylabel('Expected Returns')
-    plt.legend()
-    plt.grid(True, alpha=0.3)
-    plt.show()
+    # Den analytiska efficient frontier-kurvan
+    ax.plot(frontier_volatilities, frontier_returns, color='black', linewidth=2, label='Efficient Frontier')
+
+    # Bara de två optimala punkterna, diskreta markörer
+    ax.scatter(opt_sharpe_volatility, opt_sharpe_return, color='red', edgecolor='black',
+               marker='o', s=150, zorder=5, label='Max Sharpe Portfolio')
+    ax.scatter(opt_min_vol_volatility, opt_min_vol_return, color='blue', edgecolor='black',
+               marker='o', s=150, zorder=5, label='Min Volatility Portfolio')
+
+    ax.set_title('Efficient Frontier')
+    ax.set_xlabel('Volatility (Standard Deviation)')
+    ax.set_ylabel('Expected Returns')
+    ax.legend()
+    ax.grid(True, alpha=0.3)
+    return fig
+    
 
 if __name__ == "__main__":
     from data_fetcher import get_portfolio_data
