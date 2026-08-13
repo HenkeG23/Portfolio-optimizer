@@ -8,7 +8,7 @@ An interactive tool for portfolio optimization based on Modern Portfolio Theory 
 
 ## Screenshot
 
-![Portfolio Optimizer app](assets/screenshot.png)
+![Portfolio Optimizer app](Assets/Screenshot.png)
 
 ## Features
 
