@@ -26,14 +26,18 @@ if run_button:
     st.session_state.tickers = [ticker.strip().upper() for ticker in tickers_input.split(",")]
 
 if st.session_state.get("analysis_done", False):
-    tickers = st.session_state.tickers 
+    tickers = st.session_state.tickers
 
-    prices = get_portfolio_data(tickers)
-    daily_returns = calculate_daily_returns(prices)
+    try:
+        prices = get_portfolio_data(tickers)
+        daily_returns = calculate_daily_returns(prices)
 
-    expected_returns = calculate_expected_returns(daily_returns)
-    cov_matrix = calculate_covariance_matrix(daily_returns)
-
+        expected_returns = calculate_expected_returns(daily_returns)
+        cov_matrix = calculate_covariance_matrix(daily_returns)
+    except ValueError as e:
+        st.error(str(e))
+        st.stop()
+         
     # Max sharpe
     opt_sharpe_weights = optimize_max_sharpe(expected_returns.values, cov_matrix.values, risk_free_rate)
     opt_sharpe_return, opt_sharpe_vol = calculate_portfolio_performance(opt_sharpe_weights, expected_returns, cov_matrix)

@@ -37,6 +37,9 @@ def get_price_data(ticker: str, start: str = None, end: str = None) -> pd.DataFr
     print(f"Downloading {ticker} from yfinance...")
     df = yf.download(ticker, start=start, end=end)
 
+    if df.empty:
+        raise ValueError(f"No data found for ticker '{ticker}'. Check the symbol and try again.")
+
     # Flatten MultiIndex columns (yfinance returns (Price, Ticker) pairs for single tickers too)
     if isinstance(df.columns, pd.MultiIndex):
         df.columns = df.columns.get_level_values(0)
