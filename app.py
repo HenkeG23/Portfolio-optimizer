@@ -22,8 +22,13 @@ risk_free_rate = st.slider("Risk-free rate (%)", 0.0, 5.0, 2.0) / 100  # Convert
 run_button = st.button("Run Optimization")
 
 if run_button:
-    st.session_state.analysis_done = True
-    st.session_state.tickers = [ticker.strip().upper() for ticker in tickers_input.split(",")]
+    tickers = [ticker.strip().upper() for ticker in tickers_input.split(",") if ticker.strip()]
+    
+    if not tickers:
+        st.error("Please enter at least one ticker symbol.")
+    else:
+        st.session_state.analysis_done = True
+        st.session_state.tickers = tickers
 
 if st.session_state.get("analysis_done", False):
     tickers = st.session_state.tickers
@@ -37,7 +42,7 @@ if st.session_state.get("analysis_done", False):
     except ValueError as e:
         st.error(str(e))
         st.stop()
-         
+
     # Max sharpe
     opt_sharpe_weights = optimize_max_sharpe(expected_returns.values, cov_matrix.values, risk_free_rate)
     opt_sharpe_return, opt_sharpe_vol = calculate_portfolio_performance(opt_sharpe_weights, expected_returns, cov_matrix)
@@ -87,7 +92,7 @@ if st.session_state.get("analysis_done", False):
     raw_weights = np.array([manual_weights_raw[t] for t in tickers], dtype=float)
 
     if np.sum(raw_weights) == 0:
-        st.error("At least one weight must be greather than zero")
+        st.error("At least one weight must be greater than zero")
     else:
         normalized_weights = raw_weights / np.sum(raw_weights)
 
