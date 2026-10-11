@@ -12,21 +12,29 @@ An interactive tool for portfolio optimization based on Modern Portfolio Theory 
 
 ## Features
 
+- Search for stocks/ETFs by company name (e.g. "volvo") or enter a ticker directly
 - Fetch historical price data for any combination of stocks/ETFs via Yahoo Finance
+- Convert all prices to a common currency (SEK, USD or EUR) using daily exchange rates, so portfolios mixing markets include currency risk
+- Handle different exchange holidays by carrying the last price forward instead of dropping days
+- Choose the analysis period (1, 3, 5 or 10 years, or a custom date range)
 - Calculate annualized expected returns and covariance matrix
 - Find the portfolio with maximum Sharpe ratio using numerical optimization (scipy SLSQP)
 - Find the minimum volatility portfolio
+- Optional max weight per stock, to avoid optimized portfolios concentrated in one or two assets
 - Compute and visualize the analytical efficient frontier
-- Manually set custom portfolio weights and compare against the optimized portfolios
+- Manually set custom portfolio weights (0.1% precision) and compare against the optimized portfolios
 - Side-by-side comparison table (Return, Volatility, Sharpe Ratio) across all three strategies
-- Local CSV caching to reduce redundant API calls
-- Error handling for invalid tickers and empty inputs
+- Historical buy-and-hold performance of each portfolio against a benchmark (OMXS30 or S&P 500)
+- Local CSV caching and Streamlit caching to reduce redundant API calls and keep the UI responsive
+- Error handling for invalid tickers, empty inputs, infeasible weight caps and failed optimizations
 
 ## How It Works
 
 The tool implements Modern Portfolio Theory: given historical returns and the covariance between assets, it's possible to mathematically determine the asset weights that either maximize return per unit of risk (Sharpe ratio) or minimize total portfolio risk, subject to the constraint that weights sum to 1 and short-selling is not allowed.
 
 Two complementary approaches are used. A Monte Carlo simulation generates thousands of random portfolios to visualize the risk/return space, while `scipy.optimize` (SLSQP method) solves for the exact optimal weights analytically — this becomes noticeably more accurate than Monte Carlo as the number of assets grows, since random sampling covers a shrinking fraction of the possible weight combinations in higher dimensions. The efficient frontier itself is computed by solving a constrained optimization problem (minimize volatility for a given target return) across a range of target returns.
+
+The historical performance chart shows how 10,000 (in the chosen currency) invested on the first day would have developed in each portfolio. Note that the optimized portfolios are calculated from the same period, so the backtest is in-sample and flatters them compared to what could have been known in advance.
 
 ## Tech Stack
 
@@ -43,11 +51,11 @@ Two complementary approaches are used. A Monte Carlo simulation generates thousa
 portfolio-optimizer/
 ├── app.py                   # Streamlit UI - entry point
 ├── requirements.txt
-├── data/                     # Cached price data (CSV, gitignored)
+├── data/                     # Cached price data and currencies (gitignored)
 └── src/
-    ├── data_fetcher.py       # Data fetching + CSV caching
+    ├── data_fetcher.py       # Data fetching, CSV caching, ticker search, currency conversion
     ├── returns.py             # Price → daily returns
-    ├── portfolio_metrics.py   # Expected returns, covariance matrix, portfolio performance
+    ├── portfolio_metrics.py   # Expected returns, covariance matrix, portfolio performance, backtest
     ├── monte_carlo.py         # Monte Carlo simulation (background visualization)
     ├── optimizer.py            # scipy.optimize: max Sharpe, min volatility, efficient frontier
     └── visualization.py       # matplotlib efficient frontier plot

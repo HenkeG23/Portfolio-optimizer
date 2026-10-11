@@ -29,6 +29,20 @@ def calculate_covariance_matrix(returns: pd.DataFrame) -> pd.DataFrame:
     """
     return returns.cov() * 252
 
+def calculate_buy_and_hold_value(prices: pd.DataFrame, weights: np.ndarray, initial_value: float = 10_000) -> pd.Series:
+    """
+    Calculate how a portfolio bought at the first date and then held would have developed.
+
+    Parameters:
+        prices: DataFrame of closing prices, one column per ticker, indexed by Date.
+        weights: Array of portfolio weights at purchase (should sum to 1).
+        initial_value: Amount invested at the first date.
+    Returns:
+        Series of portfolio value per date.
+    """
+    normalized_prices = prices / prices.iloc[0]
+    return normalized_prices @ weights * initial_value
+
 
 def calculate_portfolio_performance(weights: np.ndarray, expected_returns: pd.Series, cov_matrix: pd.DataFrame) -> tuple[float, float]:
     """
