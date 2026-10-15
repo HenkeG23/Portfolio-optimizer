@@ -4,7 +4,7 @@ An interactive tool for portfolio optimization based on Modern Portfolio Theory 
 
 ## Live Demo
 
-[https://portfolio-optimizer-erbhuxdcgryfysc8gp3leh.streamlit.app/]
+[Open the app on Streamlit Cloud](https://portfolio-optimizer-erbhuxdcgryfysc8gp3leh.streamlit.app/)
 
 ## Screenshot
 
@@ -35,6 +35,23 @@ The tool implements Modern Portfolio Theory: given historical returns and the co
 Two complementary approaches are used. A Monte Carlo simulation generates thousands of random portfolios to visualize the risk/return space, while `scipy.optimize` (SLSQP method) solves for the exact optimal weights analytically — this becomes noticeably more accurate than Monte Carlo as the number of assets grows, since random sampling covers a shrinking fraction of the possible weight combinations in higher dimensions. The efficient frontier itself is computed by solving a constrained optimization problem (minimize volatility for a given target return) across a range of target returns.
 
 The historical performance chart shows how 10,000 (in the chosen currency) invested on the first day would have developed in each portfolio. Note that the optimized portfolios are calculated from the same period, so the backtest is in-sample and flatters them compared to what could have been known in advance.
+
+## Limitations
+
+This is a textbook mean-variance implementation, and it inherits the known weaknesses of that model:
+
+- **Constant risk-free rate.** The same rate is used regardless of the chosen currency, although SEK, USD and EUR rates differ.
+- **Estimation error in expected returns.** Historical mean returns are very noisy estimates of future returns. The max Sharpe optimizer is highly sensitive to small changes in these inputs and tends to concentrate weight in whatever performed best in the sample, effectively maximizing estimation error. The optional weight cap is a practical guard against this, not a solution.
+- **Unstable covariance matrix.** The sample covariance becomes unreliable as the number of assets grows relative to the number of observations.
+- **Volatility as the risk measure.** Standard deviation is symmetric, does not capture tail risk.
+- **Forward-filled prices.** Carrying prices forward over weekends creates zero-return days, which effect estimated volatility and correlations downward.
+- **In-sample backtest.** The historical performance chart uses weights optimized on the same period, it overstates what could have been achieved in practice.
+
+## Next Steps
+
+- Evaulte how different currenices affect
+- CVaR (Expected Shortfall) as an alternative
+- Walk-forward backtesting: optimize on a rolling window, evaluate on the following out-of-sample period
 
 ## Tech Stack
 
