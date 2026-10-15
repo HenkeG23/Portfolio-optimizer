@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from portfolio_metrics import calculate_portfolio_performance
 
-def monte_carlo_simulation(expected_returns: pd.Series, cov_matrix: pd.DataFrame, num_portfolios: int = 10000, risk_free_rate: float = 0.02) -> pd.DataFrame:
+def monte_carlo_simulation(expected_returns: pd.Series, cov_matrix: pd.DataFrame, num_portfolios: int = 10000, risk_free_rate: float = 0.02, max_weight: float = 1.0) -> pd.DataFrame:
     """
     Perform a Monte Carlo simulation to generate random portfolios and calculate their performance.
 
@@ -11,6 +11,7 @@ def monte_carlo_simulation(expected_returns: pd.Series, cov_matrix: pd.DataFrame
         cov_matrix: Covariance matrix of asset returns.
         num_portfolios: Number of random portfolios to simulate.
         risk_free_rate: Risk-free rate for Sharpe ratio calculation (default is 0.02).
+        max_weight: Maximum weight allowed for any single asset in the portfolio (default is 1.0).
     Returns:
         DataFrame containing portfolio returns, volatilities, and weights for each simulated portfolio.
     """
@@ -25,11 +26,18 @@ def monte_carlo_simulation(expected_returns: pd.Series, cov_matrix: pd.DataFrame
         'Weights': []
     }
 
-    i = 0
-    for i in range(num_portfolios):
-        # Generate random weights that sum to 1
+    max_attempts = num_portfolios * 10
+    attempts = 0
+    while len(results['Weights']) < num_portfolios and attempts < max_attempts:
+        attempts += 1
+
+        # Generate random weights sum up to 1
         weights = np.random.random(num_assets)
         weights /= np.sum(weights)
+
+        # Check
+        if weights.max() > max_weight:
+            continue  # Skip this portfolio 
 
         # Calculate portfolio performance
         portfolio_return, portfolio_volatility = calculate_portfolio_performance(weights, expected_returns, cov_matrix)

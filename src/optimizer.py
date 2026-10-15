@@ -127,8 +127,12 @@ def calculate_efficient_frontier(expected_returns: np.ndarray, cov_matrix: np.nd
     Returns:
         Tuple containing arrays of portfolio volatilities and returns for the efficient frontier.
     """
+
+
     bounds = weight_bounds(len(expected_returns), max_weight)
-    min_return = np.min(expected_returns)
+
+    min_vol_weights = optimize_min_volatility(expected_returns, cov_matrix, max_weight)
+    min_return = np.dot(min_vol_weights, expected_returns)
     max_return = np.max(expected_returns)
     target_returns = np.linspace(min_return, max_return, num_points)
 

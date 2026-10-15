@@ -38,7 +38,7 @@ def run_analysis(tickers: tuple, start: str, end: str, base_currency: str, risk_
     sharpe_weights = optimize_max_sharpe(expected_returns.values, cov_matrix.values, risk_free_rate, max_weight)
     minvol_weights = optimize_min_volatility(expected_returns.values, cov_matrix.values, max_weight)
 
-    mc_results = monte_carlo_simulation(expected_returns, cov_matrix, num_portfolios=2000, risk_free_rate=risk_free_rate)
+    mc_results = monte_carlo_simulation(expected_returns, cov_matrix, num_portfolios=2000, risk_free_rate=risk_free_rate, max_weight=max_weight)
     frontier_volatilities, frontier_returns = calculate_efficient_frontier(
         expected_returns.values, cov_matrix.values, num_points=50, max_weight=max_weight
     )
