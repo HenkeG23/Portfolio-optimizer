@@ -18,7 +18,7 @@ def monte_carlo_simulation(expected_returns: pd.Series, cov_matrix: pd.DataFrame
     num_assets = len(expected_returns)
     
 
-    # Create empyty lists to store simulation results
+    # Create empty lists to store simulation results
     results = {
         'Returns': [],
         'Volatility': [],

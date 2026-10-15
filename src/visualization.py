@@ -40,12 +40,11 @@ if __name__ == "__main__":
     from data_fetcher import get_portfolio_data
     from returns import calculate_daily_returns
     from portfolio_metrics import calculate_expected_returns, calculate_covariance_matrix, calculate_portfolio_performance 
-    from monte_carlo import monte_carlo_simulation, find_optimal_portfolios
-    from optimizer import optimize_max_sharpe, optimize_min_volatility
+    from monte_carlo import monte_carlo_simulation
+    from optimizer import optimize_max_sharpe, optimize_min_volatility, calculate_efficient_frontier
 
 
     # Example usage
-    # prices = get_portfolio_data(["AAPL", "MSFT"])
     prices = get_portfolio_data(["AAPL", "MSFT", "GOOGL", "AMZN", "JPM"])
     daily_returns = calculate_daily_returns(prices)
 
@@ -53,8 +52,7 @@ if __name__ == "__main__":
     cov_matrix = calculate_covariance_matrix(daily_returns)
 
     results = monte_carlo_simulation(expected_returns, cov_matrix, num_portfolios=10000, risk_free_rate=0.02)
-
-    max_sharpe_portfolio, min_volatility_portfolio = find_optimal_portfolios(results)
+    frontier_volatilities, frontier_returns = calculate_efficient_frontier(expected_returns.values, cov_matrix.values)
 
     opt_sharpe_weights = optimize_max_sharpe(expected_returns.values, cov_matrix.values, risk_free_rate=0.02)
     opt_sharpe_return, opt_sharpe_volatility = calculate_portfolio_performance(opt_sharpe_weights, expected_returns, cov_matrix)
@@ -62,12 +60,10 @@ if __name__ == "__main__":
     opt_min_vol_weights = optimize_min_volatility(expected_returns.values, cov_matrix.values)
     opt_min_vol_return, opt_min_vol_volatility = calculate_portfolio_performance(opt_min_vol_weights, expected_returns, cov_matrix)
 
-    plot_efficient_frontier(
-        results,
-        max_sharpe_portfolio,
-        min_volatility_portfolio,
-        opt_sharpe_return,
-        opt_sharpe_volatility,
-        opt_min_vol_return,
-        opt_min_vol_volatility
+    fig = plot_efficient_frontier(
+        results, frontier_volatilities, frontier_returns,
+        opt_sharpe_return, opt_sharpe_volatility,
+        opt_min_vol_return, opt_min_vol_volatility,
     )
+
+    plt.show()

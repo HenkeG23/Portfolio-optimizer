@@ -126,7 +126,7 @@ def convert_currency(prices: pd.Series, from_currency: str, to_currency: str, st
 
 def get_portfolio_data(tickers: list[str], start=None, end=None, base_currency: str = None):
     """
-    Combine multilpe tickers into a single DataFrame
+    Combine multiple tickers into a single DataFrame
 
     Parameters:
         tickers: List of stock/ETF symbols, e.g. ["AAPL", "MSFT"]

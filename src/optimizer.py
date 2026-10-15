@@ -14,7 +14,6 @@ def negative_sharpe(weights: np.ndarray, expected_returns: np.ndarray, cov_matri
         expected_returns: Array of expected returns for each asset.
         cov_matrix: Covariance matrix of asset returns.
         risk_free_rate: Risk-free rate for Sharpe ratio calculation.
-        max_weight: Maximum weight allowed in any single asset.
     Returns:
         Negative Sharpe ratio (to be minimized).
     """
