@@ -281,11 +281,10 @@ if st.session_state.get("analysis_done", False):
     final_values = backtest.ffill().iloc[-1]
     st.dataframe(
         pd.DataFrame({
-            "Final Value": final_values,
+            "Final Value": final_values.map(lambda v: f"{v:,.0f} {base_currency}"),
             "Total Return": (final_values / INITIAL_VALUE - 1) * 100,
         }),
         column_config={
-            "Final Value": st.column_config.NumberColumn(format=f"%.0f {base_currency}"),
             "Total Return": st.column_config.NumberColumn(format="%.1f%%"),
         },
     )

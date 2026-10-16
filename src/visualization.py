@@ -19,10 +19,10 @@ def plot_efficient_frontier(
                               cmap='viridis', marker='o', s=8, alpha=0.25)
     fig.colorbar(scatter_obj, ax=ax, label='Sharpe Ratio')
 
-    # Den analytiska efficient frontier-kurvan
+        # Analytical efficient frontier curve
     ax.plot(frontier_volatilities, frontier_returns, color='black', linewidth=2, label='Efficient Frontier')
 
-    # Bara de två optimala punkterna, diskreta markörer
+    # Only the two optimal points, as discrete markers
     ax.scatter(opt_sharpe_volatility, opt_sharpe_return, color='red', edgecolor='black',
                marker='o', s=150, zorder=5, label='Max Sharpe Portfolio')
     ax.scatter(opt_min_vol_volatility, opt_min_vol_return, color='blue', edgecolor='black',

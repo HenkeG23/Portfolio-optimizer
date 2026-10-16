@@ -31,13 +31,13 @@ def monte_carlo_simulation(expected_returns: pd.Series, cov_matrix: pd.DataFrame
     while len(results['Weights']) < num_portfolios and attempts < max_attempts:
         attempts += 1
 
-        # Generate random weights sum up to 1
+        # Generate random weights thtat sum up to 1
         weights = np.random.random(num_assets)
         weights /= np.sum(weights)
 
         # Check
         if weights.max() > max_weight:
-            continue  # Skip this portfolio 
+            continue  # Skip portfolio that break weight cap 
 
         # Calculate portfolio performance
         portfolio_return, portfolio_volatility = calculate_portfolio_performance(weights, expected_returns, cov_matrix)
